@@ -1,6 +1,7 @@
 const r = require('raylib');
-const g = require('./geometry')
-const p = require('./player')
+const g = require('./geometry');
+const p = require('./player');
+const e = require('./enemy');
 
 const setup = function () {
 
@@ -11,12 +12,14 @@ const setup = function () {
     }
 
     const player = p.getPlayerDetails(screen);
+    const enemies = e.getEnemies(screen);
 
     r.SetTraceLogLevel(r.LOG_NONE);
-    r.InitWindow(screen.WIDTH, screen.HEIGHT, "");
+    r.SetConfigFlags(r.FLAG_WINDOW_HIGHDPI);
+    r.InitWindow(screen.WIDTH, screen.HEIGHT, "Color Shifter");
     r.SetTargetFPS(screen.FPS);
 
-    return { screen, player }
+    return { screen, player, enemies }
 }
 
 const running = function () {
@@ -24,14 +27,22 @@ const running = function () {
 }
 
 const draw = function (world) {
-    const playerPosition = world.player.position;
     r.ClearBackground(r.WHITE);
-    r.DrawCircle(playerPosition.x, playerPosition.y, world.player.radius, r.RED);
+
+    p.draw(world.player);
+    e.draw(world.enemies);
+
     r.EndDrawing();
 }
 
 const update = function (world) {
-    p.movePlayer(world.player);
+
+    const mousePosition = r.GetMousePosition();
+    g.moveToDestination(mousePosition, world.player);
+
+    for (const enemy of world.enemies) {
+        g.moveToDestination(world.player.position, enemy);
+    }
 }
 
 const tearDown = function () {

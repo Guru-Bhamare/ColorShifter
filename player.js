@@ -1,37 +1,21 @@
-const r = require('raylib')
+const r = require('raylib');
 
 const getPlayerDetails = function ({ WIDTH, HEIGHT }) {
-
     const player = {
-        radius: 10,
+        radius: 15,
         position: { x: WIDTH / 2, y: HEIGHT / 2 },
-        speed: 3,
+        speed: 12,
     }
-
     return player;
 }
 
-const movePlayer = function (player) {
-    const mousePosition = r.GetMousePosition();
-
-    const dx = mousePosition.x - player.position.x;
-    const dy = mousePosition.y - player.position.y
-
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    const directionX = dx / distance;
-    const directionY = dy / distance;
-
-    if (Math.round(distance) <= player.speed) {
-        player.position = mousePosition;
-        return;
-    }
-
-    player.position.x += directionX * player.speed;
-    player.position.y += directionY * player.speed;
+const draw = function (player) {
+    const playerPosition = player.position;
+    r.DrawCircle(playerPosition.x, playerPosition.y, player.radius, r.SKYBLUE);
 }
+
 
 module.exports = {
     getPlayerDetails,
-    movePlayer,
+    draw,
 }
