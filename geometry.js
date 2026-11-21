@@ -7,7 +7,6 @@ function double(x) {
 
 }
 
-
 const array = [1, 2, 3, 5, 6];
 array.splice()
 

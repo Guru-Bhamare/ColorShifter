@@ -1,4 +1,6 @@
 const r = require('raylib');
+const g = require('./geometry')
+const p = require('./player')
 
 const setup = function () {
 
@@ -8,9 +10,7 @@ const setup = function () {
         FPS: 60,
     }
 
-    const player = {
-        radius: 10,
-    }
+    const player = p.getPlayerDetails(screen);
 
     r.SetTraceLogLevel(r.LOG_NONE);
     r.InitWindow(screen.WIDTH, screen.HEIGHT, "");
@@ -24,15 +24,15 @@ const running = function () {
 }
 
 const draw = function (world) {
-    const screen = world.screen;
-    const player = world.player;
-
+    const playerPosition = world.player.position;
     r.ClearBackground(r.WHITE);
-    r.DrawCircle(screen.WIDTH / 2, screen.HEIGHT / 2, player.radius, r.RED);
+    r.DrawCircle(playerPosition.x, playerPosition.y, world.player.radius, r.RED);
     r.EndDrawing();
 }
 
-const update = function () { }
+const update = function (world) {
+    p.movePlayer(world.player);
+}
 
 const tearDown = function () {
     return r.CloseWindow();
