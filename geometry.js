@@ -1,32 +1,51 @@
-function square(x) {
+const square = function (x) {
     return x * x;
 }
 
-function double(x) {
+const double = function (x) {
     return x * 2;
 }
 
-const moveToDestination = function (destination, origin) {
+const getDistance = function (destination, origin) {
+    const dx = (destination.x - origin.x);
+    const dy = (destination.y - origin.y);
+    const distance = Math.sqrt(square(dx) + square(dy));
 
-    const dx = destination.x - origin.position.x;
-    const dy = destination.y - origin.position.y
+    return { dx, dy, distance };
+}
 
-    const distance = Math.sqrt(dx * dx + dy * dy);
+const degreeToRadient = function (degree) {
+    return degree * Math.PI / 180;
+}
+
+const moveToDestination = function (destination, origin, speed) {
+    const { dx, dy, distance } = getDistance(destination, origin);
 
     const directionX = dx / distance;
     const directionY = dy / distance;
 
-    if (Math.round(distance) <= origin.speed) {
-        origin.position = destination;
-        return;
+    if (Math.round(distance) <= speed) {
+        origin = destination;
+        return true;
     }
 
-    origin.position.x += directionX * origin.speed;
-    origin.position.y += directionY * origin.speed;
+    origin.x += directionX * speed;
+    origin.y += directionY * speed;
+    return false;
+}
+
+const checkCollision = function (circleOne, circleTwo) {
+    const { distance } = getDistance(circleTwo.position, circleOne.position);
+
+    if (distance < (circleOne.radius + circleTwo.radius)) return true;
+    return false;
 }
 
 module.exports = {
     square,
     double,
     moveToDestination,
+    getDistance,
+    checkCollision,
+    degreeToRadient
 }   

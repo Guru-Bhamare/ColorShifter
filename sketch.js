@@ -2,47 +2,72 @@ const r = require('raylib');
 const g = require('./geometry');
 const p = require('./player');
 const e = require('./enemy');
+const b = require('./bullet');
+const pr = require('./particles')
 
 const setup = function () {
 
     const screen = {
-        WIDTH: 800,
-        HEIGHT: 800,
+        WIDTH: 1920,
+        HEIGHT: 1080,
         FPS: 60,
+        Title: "Color Shifter",
     }
 
-    const player = p.getPlayerDetails(screen);
-    const enemies = e.getEnemies(screen);
+    const playerConfig = p.getPlayerDetails(screen);
+    const enemies = e.getEnemies(screen, 20);
+    const bulletConfig = b.getBulletDetails();
+    const particles = [];
+
+    const game = {
+        timer: 0
+    }
+
+    const pallete = {
+        bg: { r: 14, g: 16, b: 32, a: 255 },
+    }
 
     r.SetTraceLogLevel(r.LOG_NONE);
     r.SetConfigFlags(r.FLAG_WINDOW_HIGHDPI);
-    r.InitWindow(screen.WIDTH, screen.HEIGHT, "Color Shifter");
+    r.InitWindow(screen.WIDTH, screen.HEIGHT, screen.Title);
+    r.SetMousePosition(screen.WIDTH / 2, screen.HEIGHT / 2);
     r.SetTargetFPS(screen.FPS);
 
-    return { screen, player, enemies }
+    return { screen, player: playerConfig, enemies, bullets: bulletConfig, game, pallete, particles };
 }
+
 
 const running = function () {
     return !r.WindowShouldClose();
 }
 
 const draw = function (world) {
-    r.ClearBackground(r.WHITE);
+    r.ClearBackground(world.pallete.bg);
 
     p.draw(world.player);
     e.draw(world.enemies);
+    b.draw(world.bullets.currentBullets);
+    pr.draw(world.particles);
 
     r.EndDrawing();
 }
 
 const update = function (world) {
+    const { currentBullets } = world.bullets;
 
-    const mousePosition = r.GetMousePosition();
-    g.moveToDestination(mousePosition, world.player);
+    p.move(world.player);
+    e.move(world.player, world.enemies);
 
-    for (const enemy of world.enemies) {
-        g.moveToDestination(world.player.position, enemy);
-    }
+
+    if (world.game.timer === 30) {
+        b.fire(world.player, world.enemies, currentBullets)
+        world.game.timer = 0;
+    };
+
+    b.move(world.enemies, currentBullets, world.particles);
+    world.game.timer++;
+
+    pr.move(world.particles);
 }
 
 const tearDown = function () {
